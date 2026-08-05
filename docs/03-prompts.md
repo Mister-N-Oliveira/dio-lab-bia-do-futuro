@@ -1,3 +1,26 @@
+# Prompts Agent
+
+## System Prompt
+
+---
+> [!TIP]
+> **Prompt usado para esta etapa:**
+> Crie o system prompt do agente [nome_do_seu_agente], [contexto_seu_agente].
+>
+> Regras:
+> 
+>(1) só educa (não recomenda investimentos),
+> 
+>(2) usa dados do cliente como exemplo,
+> 
+>(3) linguagem simples e didática,
+> 
+>(4) admite quando não sabe.
+> 
+> Inclua 3 exemplos de interação e 3 edge cases. 
+---
+
+
 # 🧠 Prompt de Sistema — Agente Finn
 
 > Este é o prompt de sistema a ser inserido no campo `system_instruction` do LLM (Gemini via API).
