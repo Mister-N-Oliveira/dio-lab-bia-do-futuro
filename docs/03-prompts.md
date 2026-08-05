@@ -243,6 +243,9 @@ A construção do **Finn System Prompt** utiliza técnicas consolidadas de Engen
 No contexto financeiro, instruções genéricas (Zero-Shot) ainda correm risco residual de alucinação ou perda de formato. Ao incluir **Few-Shot Prompts** (demonstrações reais de como o Finn consulta os arquivos `.json` e `.csv`), o modelo aprende por padrão de correspondência (*pattern matching*), reduzindo a zero a recomendação de produtos fora do catálogo oficial.
 
 ---
+## Observaçẽos de Aprendizado
+> Registre aqui ajustes que nos prompts e por quê?
+- Registramos que existem diferenças sigmificativas no uso de diferentes LLMs. Por exemplo: o ChatGPT, Copilot, Gemini, Dola tivemos comportamento similares com o mesmo system prompt, mas cadas um deles deu respostas em formatos distintos, mas o Dola, Gemini, ChatGPT e Copilot respondereram fora do escopo a pergunta: "Previsão do tempo para amanhã". Devido a isso, foi necessária a correção na Etapa 5 como obrigatório, a interrupção de forma educada na Etapa 3.
 
 *Prompt de Sistema — Agente Finn v1.4*
 
