@@ -28,7 +28,7 @@
     "categoria": "fundo",
     "risco": "medio",
     "rentabilidade": "6% a 12% ao ano",
-    "aporte_minimo": 10,00,
+    "aporte_minimo": 10.00,
     "indicado_para": "Perfil moderado que busca diversificação e renda recorrente mensal"
   },
   {
