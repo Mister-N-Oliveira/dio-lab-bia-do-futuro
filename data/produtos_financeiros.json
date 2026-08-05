@@ -24,12 +24,12 @@
     "indicado_para": "Quem pode esperar 90 dias (isento de IR)"
   },
   {
-    "nome": "Fundo Multimercado",
+    "nome": "Fundo Imobiliário(FII)",
     "categoria": "fundo",
     "risco": "medio",
-    "rentabilidade": "CDI + 2%",
-    "aporte_minimo": 500.00,
-    "indicado_para": "Perfil moderado que busca diversificação"
+    "rentabilidade": "6% a 12% ao ano",
+    "aporte_minimo": 10,00 a 100.00,
+    "indicado_para": "Perfil moderado que busca diversificação e renda recorrente mensal"
   },
   {
     "nome": "Fundo de Ações",
