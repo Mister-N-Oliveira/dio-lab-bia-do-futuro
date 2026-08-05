@@ -11,15 +11,15 @@ O agente Finn consome **4 fontes de dados oficiais** localizadas no repositório
 
 ```mermaid
 graph TD
-    subgraph Base de Dados ["/data"]
-        PI[👤 perfil_investidor.json]
-        PF[📊 produtos_financeiros.json]
-        TR[💳 transacoes.csv]
-        HA[💬 historico_atendimento.csv]
+    subgraph Data["Base de Dados (/data)"]
+        PI["👤 perfil_investidor.json"]
+        PF["📊 produtos_financeiros.json"]
+        TR["💳 transacoes.csv"]
+        HA["💬 historico_atendimento.csv"]
     end
 
-    subgraph Agente Finn
-        Engine[🧠 Motor de Raciocínio]
+    subgraph Finn["Agente Finn"]
+        Engine["🧠 Motor de Raciocínio"]
     end
 
     PI -->|Perfil, Renda e Objetivos| Engine
@@ -27,7 +27,7 @@ graph TD
     TR -->|Receitas e Despesas Recentes| Engine
     HA -->|Contexto de Atendimentos Anteriores| Engine
 
-    Engine --> Output([📤 Resposta Personalizada & Grounded])
+    Engine --> Output(["📤 Resposta Personalizada & Grounded"])
 ```
 
 ---
@@ -125,7 +125,54 @@ data,canal,tema,resumo,resolvido
 
 ---
 
-## 4. Regras de Segurança Anti-Alucinação para a Base
+## 4. Como os Dados São Carregados?
+
+O processo de ingestão e carregamento dos dados pela aplicação segue 4 etapas principais:
+
+```mermaid
+flowchart LR
+    A["📁 Arquivos Brutos\n(/data/*.json, *.csv)"] --> B["⚡ Leitor de Dados\n(Python / Pandas / JSON)"]
+    B --> C["🧩 Estruturação em Memória\n(Perfil, Catálogo, Extrato)"]
+    C --> D["💬 Contexto da Sessão\nInjeção no Prompt do LLM"]
+```
+
+### Etapas da Carga de Dados
+
+1. **Leitura dos Arquivos Brutos:**
+   * Na inicialização do agente ou no início da sessão do usuário, a aplicação lê os arquivos diretamente do diretório `/data/`:
+     * `perfil_investidor.json` via módulo `json`
+     * `produtos_financeiros.json` via módulo `json`
+     * `transacoes.csv` via `pandas` (ou leitor CSV nativo)
+     * `historico_atendimento.csv` via `pandas` (ou leitor CSV nativo)
+
+2. **Parsing e Estruturação:**
+   * **Perfil:** Convertido em um dicionário Python contendo as variáveis do cliente (renda, perfil de risco, reserva atual).
+   * **Produtos Financeiros:** Carregados como uma lista de objetos estruturados para busca e filtragem por categoria e risco.
+   * **Transações:** Convertidas em tabela/DataFrame com colunas tipadas (`data` em formato datetime, `valor` em float, `tipo` em string).
+   * **Histórico:** Filtrado por ID/sessão do cliente para recuperar as últimas interações.
+
+3. **Injeção de Contexto no Prompt (RAG Simples / Grounding):**
+   * Os dados processados são formatados como texto estruturado e injetados diretamente na mensagem do usuário ou nas `system_instructions` da API do LLM (Gemini):
+     ```text
+     [CONTEXTO DO CLIENTE]
+     Perfil: Moderado | Renda: R$ 5.000,00 | Reserva Atual: R$ 10.000,00
+
+     [EXTRATO RECENTE]
+     - 2025-10-01: Salário (+ R$ 5.000,00)
+     - 2025-10-02: Aluguel (- R$ 1.200,00)
+     ...
+
+     [CATÁLOGO DE PRODUTOS DISPONÍVEIS]
+     - Tesouro Selic (Renda Fixa | Risco: Baixo | Rentabilidade: 100% Selic)
+     ...
+     ```
+
+4. **Processamento do LLM:**
+   * O LLM recebe a pergunta do usuário acompanhada desse contexto pré-carregado e gera a resposta fundamentada (*grounded*) unicamente nestas informações.
+
+---
+
+## 5. Regras de Segurança Anti-Alucinação para a Base
 
 1. **Catálogo Fechado:** O Finn está **estritamente proibido** de citar fundos, ações ou produtos financeiros que não constem em `produtos_financeiros.json`.
 2. **Fidelidade aos Dados Pessoais:** Qualquer cálculo de orçamento deve ser feito **estritamente sobre** as linhas de `transacoes.csv` e a `renda_mensal` de `perfil_investidor.json`.
