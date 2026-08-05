@@ -1,55 +1,136 @@
-# Base de Conhecimento
+# 🗄️ Estrutura da Base de Conhecimento — Agente Finn
 
-## Dados Utilizados
-
-Descreva se usou os arquivos da pasta `data`, por exemplo:
-
-| Arquivo | Formato | Utilização no Agente |
-|---------|---------|---------------------|
-| `historico_atendimento.csv` | CSV | Contextualizar interações anteriores |
-| `perfil_investidor.json` | JSON | Personalizar recomendações |
-| `produtos_financeiros.json` | JSON | Sugerir produtos adequados ao perfil |
-| `transacoes.csv` | CSV | Analisar padrão de gastos do cliente |
-
-> [!TIP]
-> **Quer um dataset mais robusto?** Você pode utilizar datasets públicos do [Hugging Face](https://huggingface.co/datasets) relacionados a finanças, desde que sejam adequados ao contexto do desafio.
+> **Repositório de Origem dos Dados:**  
+> `https://github.com/Mister-N-Oliveira/dio-lab-bia-do-futuro/tree/main/data`
 
 ---
 
-## Adaptações nos Dados
+## 1. Visão Geral dos Arquivos de Dados
 
-> Você modificou ou expandiu os dados mockados? Descreva aqui.
+O agente Finn consome **4 fontes de dados oficiais** localizadas no repositório para personalizar atendimentos, analisar extratos e sugerir produtos adequados ao perfil do cliente:
 
-[Sua descrição aqui]
+```mermaid
+graph TD
+    subgraph Base de Dados ["/data"]
+        PI[👤 perfil_investidor.json]
+        PF[📊 produtos_financeiros.json]
+        TR[💳 transacoes.csv]
+        HA[💬 historico_atendimento.csv]
+    end
 
----
+    subgraph Agente Finn
+        Engine[🧠 Motor de Raciocínio]
+    end
 
-## Estratégia de Integração
+    PI -->|Perfil, Renda e Objetivos| Engine
+    PF -->|Catálogo Oficial de Investimentos| Engine
+    TR -->|Receitas e Despesas Recentes| Engine
+    HA -->|Contexto de Atendimentos Anteriores| Engine
 
-### Como os dados são carregados?
-> Descreva como seu agente acessa a base de conhecimento.
-
-[ex: Os JSON/CSV são carregados no início da sessão e incluídos no contexto do prompt]
-
-### Como os dados são usados no prompt?
-> Os dados vão no system prompt? São consultados dinamicamente?
-
-[Sua descrição aqui]
-
----
-
-## Exemplo de Contexto Montado
-
-> Mostre um exemplo de como os dados são formatados para o agente.
-
+    Engine --> Output([📤 Resposta Personalizada & Grounded])
 ```
-Dados do Cliente:
-- Nome: João Silva
-- Perfil: Moderado
-- Saldo disponível: R$ 5.000
 
-Últimas transações:
-- 01/11: Supermercado - R$ 450
-- 03/11: Streaming - R$ 55
-...
+---
+
+## 2. Mapeamento e Esquema dos Arquivos
+
+### 👤 `perfil_investidor.json`
+Contém os dados cadastrais, situação financeira atual e perfil de risco do cliente.
+
+* **Função no Agente:** Define os limites de risco para recomendações e contextualiza o patrimônio atual.
+* **Exemplo de Estrutura:**
+```json
+{
+  "nome": "João Silva",
+  "idade": 32,
+  "profissao": "Analista de Sistemas",
+  "renda_mensal": 5000.00,
+  "perfil_investidor": "moderado",
+  "objetivo_principal": "Construir reserva de emergência",
+  "patrimonio_total": 15000.00,
+  "reserva_emergencia_atual": 10000.00,
+  "aceita_risco": false
+}
 ```
+
+---
+
+### 📊 `produtos_financeiros.json`
+Catálogo de produtos financeiros liberados para consulta e recomendação pelo Finn.
+
+* **Função no Agente:** O Finn **só pode recomendar** produtos presentes neste catálogo, respeitando o alinhamento com o `perfil_investidor.json`.
+* **Exemplo de Estrutura:**
+```json
+[
+  {
+    "nome": "Tesouro Selic",
+    "categoria": "renda_fixa",
+    "risco": "baixo",
+    "rentabilidade": "100% da Selic",
+    "aporte_minimo": 30.00,
+    "indicado_para": "Reserva de emergência e iniciantes"
+  },
+  {
+    "nome": "CDB Liquidez Diária",
+    "categoria": "renda_fixa",
+    "risco": "baixo",
+    "rentabilidade": "102% do CDI",
+    "aporte_minimo": 100.00,
+    "indicado_para": "Quem busca segurança com liquidez imediata"
+  }
+]
+```
+
+---
+
+### 💳 `transacoes.csv`
+Histórico detalhado de movimentações financeiras (entradas e saídas) do usuário.
+
+* **Função no Agente:** Permite ao Finn calcular orçamento real, identificar vilões de gastos (ex: lazer, farmácia, aluguel) e propor planos de ação proativos.
+* **Esquema:** `data,descricao,categoria,valor,tipo`
+* **Exemplo de Conteúdo:**
+```csv
+data,descricao,categoria,valor,tipo
+2025-10-01,Salário,receita,5000.00,entrada
+2025-10-02,Aluguel,moradia,1200.00,saida
+2025-10-03,Supermercado,alimentacao,450.00,saida
+2025-10-05,Netflix,lazer,55.90,saida
+2025-10-07,Farmácia,saude,89.00,saida
+```
+
+---
+
+### 💬 `historico_atendimento.csv`
+Registro de conversas e dúvidas passadas do usuário com o suporte/agente.
+
+* **Função no Agente:** Oferece memória conversacional de longo prazo, evitando repetições de perguntas e mantendo o tom contínuo de mentoria.
+* **Esquema:** `data,canal,tema,resumo,resolvido`
+* **Exemplo de Conteúdo:**
+```csv
+data,canal,tema,resumo,resolvido
+2025-09-15,chat,CDB,Cliente perguntou sobre rentabilidade e prazos,sim
+2025-09-22,telefone,Problema no app,Erro ao visualizar extrato foi corrigido,sim
+2025-10-01,chat,Tesouro Selic,Cliente pediu explicação sobre o funcionamento do Tesouro Direto,sim
+```
+
+---
+
+## 3. Como o Agente cruza os dados em tempo de execução
+
+| Solicitação do Usuário | Arquivos Consultados | Ação do Finn |
+|---|---|---|
+| *"Quais opções de investimento combinam comigo?"* | `perfil_investidor.json` + `produtos_financeiros.json` | Filtra produtos do catálogo cujo `risco` e `indicado_para` coincidam com o `perfil_investidor` e o `objetivo_principal`. |
+| *"Como estão meus gastos este mês?"* | `transacoes.csv` + `perfil_investidor.json` | Soma as saídas por `categoria` em `transacoes.csv` e compara o total gasto em relação à `renda_mensal`. |
+| *"Já perguntei sobre Tesouro Selic antes?"* | `historico_atendimento.csv` | Busca ocorrências no tema `Tesouro Selic` e relembra o atendimento prévio registrado. |
+
+---
+
+## 4. Regras de Segurança Anti-Alucinação para a Base
+
+1. **Catálogo Fechado:** O Finn está **estritamente proibido** de citar fundos, ações ou produtos financeiros que não constem em `produtos_financeiros.json`.
+2. **Fidelidade aos Dados Pessoais:** Qualquer cálculo de orçamento deve ser feito **estritamente sobre** as linhas de `transacoes.csv` e a `renda_mensal` de `perfil_investidor.json`.
+3. **Respeito ao Perfil:** Se `aceita_risco: false`, o Finn **jamais** poderá sugerir produtos com `risco` alto ou médio presentes no catálogo.
+
+---
+
+*Especificação da Base de Conhecimento — Agente Finn v1.0*
