@@ -101,6 +101,14 @@ O Finn foi construído aplicando técnicas consolidadas de **Engenharia de Promp
 
 ---
 
+## Evidências de Execução
+
+<img width="1341" height="919" alt="image" src="https://github.com/user-attachments/assets/f9bda823-ab54-4bde-8cc9-c4bf8f8ab0ae" />
+
+
+
+
+
 ## 📜 Licença
 
 Projeto desenvolvido para fins educacionais no âmbito da **Digital Innovation One (DIO)**.
