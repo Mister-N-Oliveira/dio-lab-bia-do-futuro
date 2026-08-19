@@ -26,22 +26,33 @@
 ## 📁 Estrutura do Repositório
 
 ```text
-.
-├── app.py                      # Aplicação web principal em Streamlit
-├── requirements.txt            # Dependências da aplicação Python
-├── .env.example                # Modelo de configuração da API Key
-├── README.md                   # Documentação do projeto
-├── Dados/                      # Base de Conhecimento do Cliente
-│   ├── perfil_investidor.json  # Dados cadastrais e perfil de risco
-│   ├── produtos_financeiros.json # Catálogo oficial de investimentos
-│   ├── transacoes.csv          # Extrato recente de receitas e despesas
-│   └── historico_atendimento.csv # Memória de atendimentos anteriores
-└── Finn/
-    ├── Dados/                  # Cópia de segurança dos dados
-    └── GitHub/                 # Documentação técnica completa
-        ├── agente_financeiro_design.md  # Especificação da persona e arquitetura
-        ├── finn_system_prompt.md        # Prompt do sistema com poucas demonstrações (Few-Shot)
-        └── finn_knowledge_base.md       # Esquema detalhado da base de conhecimento
+📁 lab-agente-financeiro/
+│
+├── 📄 README.md
+│
+├── 📁 data/                          # Dados mockados para o agente
+│   ├── historico_atendimento.csv     # Histórico de atendimentos (CSV)
+│   ├── perfil_investidor.json        # Perfil do cliente (JSON)
+│   ├── produtos_financeiros.json     # Produtos disponíveis (JSON)
+│   └── transacoes.csv                # Histórico de transações (CSV)
+│
+├── 📁 docs/                          # Documentação do projeto
+│   ├── 01-documentacao-agente.md     # Caso de uso e arquitetura
+│   ├── 02-base-conhecimento.md       # Estratégia de dados
+│   ├── 03-prompts.md                 # Engenharia de prompts
+│   ├── 04-metricas.md                # Avaliação e métricas
+│   └── 05-pitch.md                   # Roteiro do pitch
+│
+├── 📁 src/                           # Código da aplicação
+│   └── app.py                        # (exemplo de estrutura)
+|   └── eval_agent.py                 # (exemplo de estrutura)
+|   └── finance_engine.py             # (exemplo de estrutura)
+│
+├── 📁 assets/                        # Imagens e diagramas
+│   └── ...
+│
+└── 📁 examples/                      # Referências e exemplos
+    └── README.md
 ```
 
 ---
