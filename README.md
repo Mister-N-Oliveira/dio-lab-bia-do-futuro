@@ -130,6 +130,8 @@ Todas as ferramentas abaixo possuem versões gratuitas:
 │
 ├── 📁 src/                           # Código da aplicação
 │   └── app.py                        # (exemplo de estrutura)
+|   └── eval_agent.py                 # (exemplo de estrutura)
+|   └── finance_engine.py             # (exemplo de estrutura)
 │
 ├── 📁 assets/                        # Imagens e diagramas
 │   └── ...
