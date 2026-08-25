@@ -9,7 +9,7 @@
 A avaliação do agente Finn combina duas abordagens complementares de observabilidade:
 
 1. **Testes Estruturados Automatizados (`eval_agent.py` / `finance_engine.py`):** Suíte contendo os 18 cenários formais de teste cobrindo cálculos de extrato, perfil de risco, recomendações do catálogo, busca na web e recusa de escopo.
-2. **Avaliação das Métricas em Tempo de Execução (Streamlit):** Painel dinâmico embutido no `src/app.py` que calcula Escopo, Grounding, Cortesia e Score da Resposta para cada mensagem enviada.
+2. **Avaliação das Métricas em Background:** O sistema avalia internamente Escopo, Grounding, Cortesia e Score da Resposta. (Estes dados foram ocultados da UI principal para uma experiência de chat mais limpa).
 
 ---
 
@@ -56,8 +56,8 @@ A avaliação do agente Finn combina duas abordagens complementares de observabi
 
 - **Score Global de Resposta:** 98.5% de média acumulada.
 - **Zero Alucinações de Escopo:** Bloqueio 100% eficaz contra perguntas de clima, futebol, culinária ou política.
-- **Grounding Web & Local:** Respostas educativas enriquecidas com busca ao vivo na internet (links clicáveis) e cálculos fiéis a `transacoes.csv`.
-- **Interface e Layout (UX):** Caixa de entrada `st.chat_input` fixada no final da tela (abaixo das respostas) com hot-reload ativo (`importlib.reload`).
+- **Grounding Web & Local:** Respostas educativas e simulações reversas precisas, com cálculos fiéis a `transacoes.csv`, omitindo fontes diretas de links a pedido do usuário.
+- **Interface e Layout (UX):** Caixa de entrada `st.chat_input` fixada no final da tela (abaixo das respostas) focada na interação natural.
 
 ---
 
