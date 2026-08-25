@@ -97,7 +97,7 @@ A engenharia do Prompt do Finn (`finn_system_prompt.md`) combina três técnicas
 ## 6. Layout e Experiência do Usuário (UX)
 
 - **Caixa de Entrada Fixada no Final (`st.chat_input`):** Posicionada **após** o laço de renderização das mensagens no `src/app.py`, garantindo que o campo de digitação fique **sempre abaixo de todas as respostas** na tela.
-- **Badges Visuais de Métricas:** Cada resposta exibe badges de qualidade em tempo de execução (Escopo, Grounding, Cortesia e Score Resposta).
+- **Interface Limpa e Focada:** As métricas de qualidade (Escopo, Grounding, Cortesia) rodam em background e foram ocultadas da interface principal para não distrair o usuário, focando na conversa.
 - **Perguntas Rápidas:** Botões superiores para acionamento com um clique dos testes principais do cliente.
 - **Tema Dark/Glassmorphism:** Interface com tipografia Inter, gradientes modernos, cards com bordas suaves e paleta de cores HSL/roxo premium.
 
@@ -120,7 +120,8 @@ Pergunta do Usuário
       is_lowest_minimum_question()       → answer_lowest_minimum()
       is_tesouro_history_question()      → answer_tesouro_history()
       is_frequent_topics_question()      → answer_frequent_topics()
-      is_cdb_simulation_question()       → answer_cdb_simulation()
+      is_generic_simulation_question()   → answer_generic_simulation()
+                                           (Suporta simulação direta e reversa para múltiplos produtos)
       is_apartment_goal_question()       → answer_apartment_goal()
       is_unknown_product_question()      → answer_unknown_product()
       is_generic_recommendation_question() → answer_emergency_recommendation()
