@@ -528,13 +528,19 @@ class FinanceEngine:
         text = self.normalize(question)
 
         # Se não for uma pergunta financeira nem saudação, recusa educadamente
-        greetings = ["oi", "ola", "bom dia", "boa tarde", "boa noite", "ajuda", "ajudar", "tudo bem"]
-        if not self.is_financial_query(text) and not any(g in text for g in greetings):
+        greetings = ["oi", "ola", "olá", "bom dia", "boa tarde", "boa noite", "ajuda", "ajudar", "tudo bem"]
+        is_greeting = any(g in text for g in greetings)
+        
+        if not self.is_financial_query(text) and not is_greeting:
             return (
                 "Desculpe, sou um assistente virtual especializado exclusivamente em "
                 "finanças pessoais e investimentos. Não posso responder a perguntas "
                 "sobre outros assuntos como previsão do tempo, esportes, entretenimento ou política."
             )
+            
+        # Se for APENAS uma saudação, sem nenhuma dúvida financeira junto, responde de forma gentil
+        if is_greeting and not self.is_financial_query(text):
+            return "Olá, em que posso ajudá-lo hoje?"
 
         text = self.normalize(question)
 
@@ -717,9 +723,10 @@ class FinanceEngine:
         """Detecta perguntas genéricas de simulação de investimento."""
         has_value = bool(re.search(r'\d+[.,]?\d*\s*(reais|real|r\$)', text, re.IGNORECASE)) or bool(re.search(r'r\$\s*\d', text, re.IGNORECASE))
         has_period = bool(re.search(r'\d+\s*(anos?|meses|mes)', text, re.IGNORECASE))
-        has_invest = any(w in text for w in ['investir', 'aplicar', 'aplicado', 'investimento', 'terei', 'renderia', 'render', 'rende'])
+        has_reverse = any(w in text for w in ['alcançar', 'chegar em', 'juntar para ter']) or ('quanto preciso juntar' in text) or ('quanto preciso investir' in text)
+        has_invest = any(w in text for w in ['investir', 'aplicar', 'aplicado', 'investimento', 'terei', 'renderia', 'render', 'rende', 'juntar', 'alcançar'])
         has_product = any(w in text for w in ['cdb', 'tesouro selic', 'lci', 'lca', 'poupanca', 'poupança', 'fundo'])
-        return has_value and has_period and (has_invest or has_product)
+        return has_value and (has_period or has_reverse) and (has_invest or has_product)
 
     def is_apartment_goal_question(self, text: str) -> bool:
         return (
@@ -1002,6 +1009,9 @@ class FinanceEngine:
         # Detectar se é aporte mensal ou único
         params['mensal'] = any(w in text for w in ['todo mes', 'todo mês', 'por mes', 'por mês', 'mensal', 'mensais', 'mensalmente'])
 
+        # Detectar se é simulação reversa (objetivo)
+        params['is_reverse'] = any(w in text for w in ['alcançar', 'chegar em', 'juntar para ter']) or ('quanto preciso juntar' in text) or ('quanto preciso investir' in text)
+
         # Detectar produto e taxa
         if 'tesouro selic' in text:
             params['produto'] = 'Tesouro Selic'
@@ -1041,7 +1051,25 @@ class FinanceEngine:
         i_mensal = (1 + taxa_anual) ** (1/12) - 1
         produto = params['produto']
 
-        if params['mensal']:
+        if params.get('is_reverse'):
+            fv = valor
+            if i_mensal > 0:
+                pmt = fv * i_mensal / (((1 + i_mensal) ** meses) - 1)
+            else:
+                pmt = fv / meses
+            total_investido = pmt * meses
+            rendimento = fv - total_investido
+            
+            return (
+                f"**Simulação de Objetivo: {produto}** — Meta: **{self.money(fv)}** em **{params['periodo_desc']}**\n\n"
+                f"- Taxa utilizada: **{params['taxa_desc']}**\n"
+                f"- Aporte mensal necessário: **{self.money(pmt)}/mês**\n"
+                f"- Total investido no período: **{self.money(total_investido)}**\n"
+                f"- Rendimento bruto estimado: **{self.money(rendimento)}**\n\n"
+                f"{params['ir_info']}\n\n"
+                "*Os valores são estimativas e podem variar conforme oscilação da taxa de juros.*"
+            )
+        elif params['mensal']:
             # Aportes mensais — série de pagamentos
             fv = valor * (((1 + i_mensal) ** meses - 1) / i_mensal)
             total_investido = valor * meses
