@@ -407,17 +407,8 @@ with tab_chat:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
             
-            # Se a mensagem contiver métricas avaliadas, exibe os badges
-            if message.get("metrics"):
-                m = message["metrics"]
-                st.markdown(f"""
-                <div class="metrics-panel">
-                    <span class="metrics-pill">🎯 Escopo: {m['scope_status']}</span>
-                    <span class="metrics-pill">📌 Grounding: {m['grounding_score']:.0f}%</span>
-                    <span class="metrics-pill">💬 Cortesia: {m['politeness_score']:.0f}%</span>
-                    <span class="metrics-score">⭐️ Score Resposta: {m['overall_score']:.1f}%</span>
-                </div>
-                """, unsafe_allow_html=True)
+            # As métricas e badges foram ocultados da interface principal a pedido do usuário
+            pass
 
     # 2. Entrada do usuário no FINAL ABSOLUTO (sempre abaixo de todas as respostas)
     user_input = st.chat_input("Digite sua dúvida financeira para o Finn...")
