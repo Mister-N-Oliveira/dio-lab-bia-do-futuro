@@ -8,12 +8,12 @@ Esta pasta contém exemplos de implementação para cada etapa do desafio.
 
 | Etapa | Descrição | Link |
 |-------|-----------|------|
-| Documentação | Como definir o caso de uso e arquitetura | [em breve] |
-| Base de Conhecimento | Como usar os dados mockados | [em breve] |
-| Prompts | Como criar prompts eficazes | [em breve] |
-| Aplicação | Como criar o chatbot funcional | [em breve] |
-| Métricas | Como avaliar seu agente | [em breve] |
-| Pitch | Como apresentar sua solução | [em breve] |
+| Documentação | Como definir o caso de uso e arquitetura | https://github.com/Mister-N-Oliveira/dio-lab-bia-do-futuro/blob/main/docs/01-documentacao-agente.md |
+| Base de Conhecimento | Como usar os dados mockados | https://github.com/Mister-N-Oliveira/dio-lab-bia-do-futuro/blob/main/docs/02-base-conhecimento.md |
+| Prompts | Como criar prompts eficazes | https://github.com/Mister-N-Oliveira/dio-lab-bia-do-futuro/blob/main/docs/03-prompts.md |
+| Aplicação | Como criar o chatbot funcional | Em breve |
+| Métricas | Como avaliar seu agente | https://github.com/Mister-N-Oliveira/dio-lab-bia-do-futuro/blob/main/docs/04-metricas.md |
+| Pitch | Como apresentar sua solução | https://github.com/Mister-N-Oliveira/dio-lab-bia-do-futuro/blob/main/docs/05-pitch.md |
 
 ## Exemplo de Implementação Simples
 
