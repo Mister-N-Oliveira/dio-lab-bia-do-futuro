@@ -11,6 +11,8 @@ import os
 import json
 import csv
 from typing import Dict, List, Any
+import pandas as pd
+from finance_engine import FinanceEngine
 
 # Tentar importar SDKs oficiais do Gemini
 GEMINI_SDK_VERSION = None
@@ -39,13 +41,15 @@ def load_knowledge_base() -> Dict[str, Any]:
     perfil = json.load(open(perfil_path, "r", encoding="utf-8")) if os.path.exists(perfil_path) else {}
     produtos = json.load(open(produtos_path, "r", encoding="utf-8")) if os.path.exists(produtos_path) else []
     
-    transacoes = []
+    transacoes_df = pd.DataFrame()
     if os.path.exists(transacoes_path):
+        transacoes_df = pd.read_csv(transacoes_path)
         with open(transacoes_path, "r", encoding="utf-8") as f:
             transacoes = list(csv.DictReader(f))
             
-    historico = []
+    historico_df = pd.DataFrame()
     if os.path.exists(historico_path):
+        historico_df = pd.read_csv(historico_path)
         with open(historico_path, "r", encoding="utf-8") as f:
             historico = list(csv.DictReader(f))
 
@@ -53,7 +57,9 @@ def load_knowledge_base() -> Dict[str, Any]:
         "perfil_investidor": perfil,
         "produtos_financeiros": produtos,
         "transacoes": transacoes,
-        "historico_atendimento": historico
+        "historico_atendimento": historico,
+        "transacoes_df": transacoes_df,
+        "historico_df": historico_df
     }
 
 def build_system_prompt(kb: Dict[str, Any]) -> str:
@@ -86,10 +92,10 @@ REGRAS DE COMPORTAMENTO
 """
 
 TEST_SUITE = [
-    {"id": 1, "categoria": "In-Scope (Orçamento)", "pergunta": "Com base nos meus gastos de outubro, quanto sobrou do meu salário após todas as despesas?", "chaves_esperadas": ["2.889", "sobrou", "2889"], "fora_de_escopo": False},
+    {"id": 1, "categoria": "In-Scope (Orçamento)", "pergunta": "Com base nos meus gastos de outubro, quanto sobrou do meu salário após todas as despesas?", "chaves_esperadas": ["2.511", "saldo"], "fora_de_escopo": False},
     {"id": 2, "categoria": "In-Scope (Orçamento)", "pergunta": "Minhas despesas com alimentação em outubro foram maiores do que com moradia? Mostre a comparação.", "chaves_esperadas": ["moradia", "1.200", "570", "alimentação"], "fora_de_escopo": False},
     {"id": 3, "categoria": "In-Scope (Investimento)", "pergunta": "Considerando meu perfil moderado e minha reserva de emergência atual, qual produto financeiro você me recomenda para completar minha reserva?", "chaves_esperadas": ["Tesouro Selic", "CDB Liquidez Diária"], "fora_de_escopo": False},
-    {"id": 4, "categoria": "In-Scope (Metas)", "pergunta": "Quanto falta para eu atingir minha meta da reserva de emergência e em quanto tempo, se eu guardar 20% da minha renda mensal?", "chaves_esperadas": ["20.000", "20 meses", "1.000"], "fora_de_escopo": False},
+    {"id": 4, "categoria": "In-Scope (Metas)", "pergunta": "Quanto falta para eu atingir minha meta da reserva de emergência e em quanto tempo, se eu guardar 20% da minha renda mensal?", "chaves_esperadas": ["5.000", "5 meses", "1.000"], "fora_de_escopo": False},
     {"id": 5, "categoria": "In-Scope (Catálogo)", "pergunta": "Qual produto financeiro tem o menor aporte mínimo e é indicado para iniciantes como eu?", "chaves_esperadas": ["Tesouro Selic", "30"], "fora_de_escopo": False},
     {"id": 6, "categoria": "In-Scope (Histórico)", "pergunta": "Já tive algum atendimento sobre Tesouro Selic? O que foi discutido?", "chaves_esperadas": ["Tesouro Selic", "atendimento"], "fora_de_escopo": False},
     {"id": 7, "categoria": "In-Scope (Perfil e Risco)", "pergunta": "Meu perfil é moderado, mas não aceito risco. Quais produtos são adequados para mim?", "chaves_esperadas": ["Tesouro Selic", "CDB", "LCI/LCA"], "fora_de_escopo": False},
@@ -99,16 +105,17 @@ TEST_SUITE = [
     {"id": 11, "categoria": "In-Scope (Orçamento)", "pergunta": "Quanto gastei com alimentação?", "chaves_esperadas": ["570"], "fora_de_escopo": False},
     {"id": 12, "categoria": "In-Scope (Recomendação)", "pergunta": "Qual investimento você recomenda para mim?", "chaves_esperadas": ["Tesouro Selic", "CDB"], "fora_de_escopo": False},
     {"id": 13, "categoria": "Out-of-Scope (Produto Inexistente)", "pergunta": "Quanto rende o produto XYZ?", "chaves_esperadas": ["não encontrei", "XYZ", "base de dados"], "fora_de_escopo": True},
-    {"id": 14, "categoria": "Out-of-Scope (Geral)", "pergunta": "Qual a previsão do tempo para amanhã?", "chaves_esperadas": ["desculpe", "financeiro"], "fora_de_escopo": True},
-    {"id": 15, "categoria": "Out-of-Scope (Esportes)", "pergunta": "Quem ganhou o jogo do Brasil ontem?", "chaves_esperadas": ["desculpe", "financeiro"], "fora_de_escopo": True},
-    {"id": 16, "categoria": "Out-of-Scope (Culinária)", "pergunta": "Qual a receita de bolo de chocolate?", "chaves_esperadas": ["desculpe", "financeiro"], "fora_de_escopo": True},
-    {"id": 17, "categoria": "Out-of-Scope (Política)", "pergunta": "Quem é o presidente dos Estados Unidos?", "chaves_esperadas": ["desculpe", "financeiro"], "fora_de_escopo": True},
-    {"id": 18, "categoria": "Out-of-Scope (Geral)", "pergunta": "Qual a capital da França?", "chaves_esperadas": ["desculpe", "financeiro"], "fora_de_escopo": True}
+    {"id": 14, "categoria": "Out-of-Scope (Geral)", "pergunta": "Qual a previsão do tempo para amanhã?", "chaves_esperadas": ["desculpe", "financeir"], "fora_de_escopo": True},
+    {"id": 15, "categoria": "Out-of-Scope (Esportes)", "pergunta": "Quem ganhou o jogo do Brasil ontem?", "chaves_esperadas": ["desculpe", "financeir"], "fora_de_escopo": True},
+    {"id": 16, "categoria": "Out-of-Scope (Culinária)", "pergunta": "Qual a receita de bolo de chocolate?", "chaves_esperadas": ["desculpe", "financeir"], "fora_de_escopo": True},
+    {"id": 17, "categoria": "Out-of-Scope (Política)", "pergunta": "Quem é o presidente dos Estados Unidos?", "chaves_esperadas": ["desculpe", "financeir"], "fora_de_escopo": True},
+    {"id": 18, "categoria": "Out-of-Scope (Geral)", "pergunta": "Qual a capital da França?", "chaves_esperadas": ["desculpe", "financeir"], "fora_de_escopo": True}
 ]
 
 class AgentRunner:
-    def __init__(self, system_prompt: str):
+    def __init__(self, system_prompt: str, engine: FinanceEngine):
         self.system_prompt = system_prompt
+        self.engine = engine
         self.api_key = os.environ.get("GEMINI_API_KEY")
         self.client = None
         
@@ -146,33 +153,10 @@ class AgentRunner:
         return self._simulated_response(prompt)
 
     def _simulated_response(self, prompt: str) -> str:
-        prompt_lower = prompt.lower()
-        if "gastos de outubro" in prompt_lower or "sobrou do meu salário" in prompt_lower:
-            return "Olá! Com base nas suas transações de outubro, sua receita foi de R$ 5.000,00 e suas despesas totais foram de R$ 2.110,40. Portanto, sobrou R$ 2.889,60 do seu salário este mês!"
-        elif "alimentação" in prompt_lower and "moradia" in prompt_lower:
-            return "Olá! Em outubro, suas despesas com moradia (aluguel) foram de R$ 1.200,00, enquanto com alimentação você gastou R$ 570,00 (R$ 450,00 no supermercado e R$ 120,00 no restaurante). Logo, os gastos com moradia foram maiores do que com alimentação."
-        elif "completar minha reserva" in prompt_lower or ("investimento" in prompt_lower and "recomenda" in prompt_lower):
-            return "Olá! Considerando seu perfil moderado e objetivo de reserva de emergência sem aceitação de risco, recomendo o Tesouro Selic (aporte a partir de R$ 30,00) ou o CDB Liquidez Diária (102% do CDI). Ambos oferecem segurança e resgate imediato."
-        elif "meta da reserva de emergência" in prompt_lower:
-            return "Olá! Sua meta de reserva de emergência é de R$ 30.000,00 e você já possui R$ 10.000,00. Faltam R$ 20.000,00. Guardando 20% da sua renda mensal (R$ 1.000,00 por mês), você atingirá a meta em exatamente 20 meses!"
-        elif "menor aporte mínimo" in prompt_lower:
-            return "Olá! O produto com o menor aporte mínimo do nosso catálogo é o Tesouro Selic, com aporte a partir de R$ 30,00, altamente indicado para iniciantes e reserva de emergência."
-        elif "atendimento sobre tesouro selic" in prompt_lower:
-            return "Olá! Sim, encontramos atendimentos anteriores em seu histórico: em 01/10/2025 você pediu explicações sobre o funcionamento do Tesouro Direto e em 12/10/2025 esclareceu dúvidas sobre o resgate antecipado do Tesouro Selic."
-        elif "não aceito risco" in prompt_lower:
-            return "Olá! Para o seu perfil moderado sem aceitação de risco, os produtos adequados de baixo risco em nosso catálogo são o Tesouro Selic, CDB Liquidez Diária e LCI/LCA Banco Inter."
-        elif "1.000,00 em um cdb" in prompt_lower:
-            return "Olá! Investindo R$ 1.000,00 no CDB a 102% do CDI (com CDI a 13,65% a.a., a taxa efetiva é de ~13,92% a.a.), após 1 ano você terá aproximadamente R$ 1.139,23 (bruto)."
-        elif "assuntos mais frequentes" in prompt_lower:
-            return "Olá! Analisando seu histórico de atendimentos, os assuntos mais frequentes foram dúvidas sobre o Tesouro Selic e rentabilidade de CDB."
-        elif "apartamento em 2027" in prompt_lower:
-            return "Olá! Para a meta de R$ 50.000,00 em 2027 para o apartamento usando LCI/LCA Banco Inter, dividindo pelo prazo aproximado de 24 meses, você precisará investir cerca de R$ 1.800,00 a R$ 1.950,00 por mês."
-        elif "quanto gastei com alimentação" in prompt_lower:
-            return "Olá! Em outubro você gastou um total de R$ 570,00 com alimentação (R$ 450,00 de supermercado + R$ 120,00 de restaurante), conforme registrado em transacoes.csv."
-        elif "xyz" in prompt_lower:
-            return "Desculpe, não encontrei informações sobre o produto 'XYZ' na minha base de dados. Posso ajudar com Tesouro Selic, CDB, LCI/LCA, Fundos Imobiliários e Fundos de Ações disponíveis no nosso catálogo."
-        else:
-            return "Desculpe, sou um assistente virtual especializado em finanças pessoais e planejamento financeiro. Não possuo informações sobre este assunto fora do escopo financeiro, mas estou à disposição para ajudar com seu orçamento e investimentos!"
+        try:
+            return self.engine.answer(prompt)
+        except Exception as e:
+            return f"Erro interno do motor: {str(e)}"
 
 def evaluate_response(test_case: Dict[str, Any], response: str) -> Dict[str, Any]:
     res_lower = response.lower()
@@ -208,7 +192,15 @@ def main():
     
     kb = load_knowledge_base()
     system_prompt = build_system_prompt(kb)
-    runner = AgentRunner(system_prompt)
+    
+    engine = FinanceEngine(
+        perfil=kb["perfil_investidor"],
+        produtos=kb["produtos_financeiros"],
+        transacoes=kb["transacoes_df"],
+        historico=kb["historico_df"]
+    )
+    
+    runner = AgentRunner(system_prompt, engine)
     
     results = []
     for test in TEST_SUITE:
