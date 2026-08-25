@@ -290,7 +290,6 @@ BASE DE DADOS OFICIAL DO CLIENTE (/data)
                         contents=formatted_contents,
                         config=types.GenerateContentConfig(
                             system_instruction=full_system_instructions,
-                            tools=[types.Tool(google_search=types.GoogleSearch())],
                             temperature=0.3,
                             top_p=0.9,
                             max_output_tokens=2000
