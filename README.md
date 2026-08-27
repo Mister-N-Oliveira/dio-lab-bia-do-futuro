@@ -128,16 +128,21 @@ Todas as ferramentas abaixo possuem versões gratuitas:
 │   ├── 04-metricas.md                # Avaliação e métricas
 │   └── 05-pitch.md                   # Roteiro do pitch
 │
-├── 📁 src/                           # Código da aplicação
-│   └── app.py                        # (exemplo de estrutura)
-|   └── eval_agent.py                 # (exemplo de estrutura)
-|   └── finance_engine.py             # (exemplo de estrutura)
+├── 📁 src/                      # **Código‑fonte da aplicação**
+│   ├── **app.py**                 # Interface web baseada em Streamlit – controla a UI, captura a entrada do usuário,
+│   │                                 exibe a conversa e invoca o *FinanceEngine* para gerar respostas.
+│   ├── **eval_agent.py**          # Suite de testes automatizados – executa os 18 cenários descritos em
+│   │                                 `docs/04-metricas.md` e valida a corretude da lógica do motor.
+│   └── **finance_engine.py**      # Núcleo de negócios – classifica a intenção da pergunta,
+│                                     processa simulações financeiras (diretas e reversas),
+│                                     calcula métricas de orçamento, gera respostas
+│                                     empáticas (saudações) e garante o escopo.
 │
-├── 📁 assets/                        # Imagens e diagramas
-│   └── ...
-│
-└── 📁 examples/                      # Referências e exemplos
-    └── README.md
+├── .env.example                 # Modelo de arquivo de variáveis de ambiente
+│                                 (contém placeholder para `GEMINI_API_KEY` – NÃO versionar a chave real)
+├── iniciar.sh                   # Script de bootstrap – instala dependências e lança `streamlit run app.py`
+├── requirements.txt             # Lista de dependências Python
+
 ```
 
 ---
