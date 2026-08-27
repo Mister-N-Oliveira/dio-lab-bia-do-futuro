@@ -3,6 +3,8 @@
 Esta pasta é destinada a recursos visuais do seu projeto:
 
 - Diagramas de arquitetura
+
+Funiconamento:
  ```mermaid
 flowchart TD
     A([Usuário envia mensagem no Chat]) --> B[Interface Streamlit src/app.py]
@@ -19,6 +21,14 @@ flowchart TD
     I --> J[st.chat_input fixado no Final da Tela]
 ```
 
+Como os dados são carregados:
+```mermaid
+flowchart LR
+    A["📁 Arquivos Locais\n(/data/*.json, *.csv)"] --> B["⚡ Leitor FinanceEngine\n(Pandas / JSON)"]
+    W["🌐 Busca na Web (DDGS / Google)"] --> B
+    B --> C["🧩 Classificação de Intenção\n(Gastos, Produtos, Escopo, Web)"]
+    C --> D["💬 Injeção no Prompt do LLM\nou Resposta Determinística"]
+```
   
 - Screenshots da aplicação
 <img width="1665" height="900" alt="image" src="https://github.com/user-attachments/assets/8a0f09d9-338c-48b8-820d-bc76aa15137c" />
