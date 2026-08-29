@@ -3,7 +3,7 @@
 
 - Diagramas de arquitetura
 
-Funiconamento:
+Funcionamento:
  ```mermaid
 flowchart TD
     A([Usuário envia mensagem no Chat]) --> B[Interface Streamlit src/app.py]
