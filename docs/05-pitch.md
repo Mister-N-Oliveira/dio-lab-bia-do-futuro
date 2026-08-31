@@ -1,9 +1,8 @@
 # Pitch (3 minutos)
 
 > [!TIP]
-> Você pode usar alguns slides pra apoiar no seu Pitch e mostrar sua solução na prática.
  
-## Roteiro Sugerido
+## Roteiro FINN
 
 ### 1. O Problema (30 seg)
 > Qual dor do cliente você resolve?
